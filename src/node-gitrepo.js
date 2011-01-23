@@ -5,7 +5,9 @@
  * @author Jan Kuča <jan@jankuca.com>
  */
 
-var spawn = require('child_process').spawn,
+var child_process = require('child_process'),
+	spawn = child_process.spawn,
+	exec = child_process.exec,
 	Path = require('path'),
 	FileSystem = require('fs');
 
@@ -13,13 +15,13 @@ var spawn = require('child_process').spawn,
 var Repository = function (path, bare) {
 	path = Path.normalize(path);
 	if (!bare) {
-		this.tree_dir = path;
+		this.tree_dir = Path.normalize(path + '/');
 		this.git_dir = Path.join(path, '.git');
 	} else {
 		this.tree_dir = null;
 		this.git_dir = path;
 	}
-	this.bare = bare;
+	this.bare = !!bare;
 };
 
 Repository.prototype.init = function (callback) {
@@ -53,7 +55,7 @@ Repository.prototype.addRemote = function (name, url, branch, callback) {
 		branch = 'master';
 	}
 
-	var args = this._getCommonArgs();
+	var args = [];
 	args.push('remote', 'add', name);
 	args.push(url);
 	args.push('-b', branch);
@@ -62,7 +64,7 @@ Repository.prototype.addRemote = function (name, url, branch, callback) {
 };
 
 Repository.prototype.add = function (target, callback) {
-	var args = this._getCommonArgs();
+	var args = [];
 	args.push('add', target);
 
 	this._exec(args, callback);
@@ -73,7 +75,7 @@ Repository.prototype.addFrom = function (source, target, callback) {
 		if (err) {
 			callback(err);
 		} else {
-			var args = this._getCommonArgs();
+			var args = [];
 			args.push('add', target);
 
 			this._exec(args, callback);
@@ -82,7 +84,7 @@ Repository.prototype.addFrom = function (source, target, callback) {
 };
 
 Repository.prototype.commit = function (message, callback) {
-	var args = this._getCommonArgs();
+	var args = [];
 	args.push('commit');
 	args.push('-m', message);
 
@@ -90,32 +92,23 @@ Repository.prototype.commit = function (message, callback) {
 };
 
 Repository.prototype.pull = function (remote, branches, callback) {
-	var args = this._getCommonArgs();
+	var args = [];
 	args.push('pull', remote, branches);
 
 	this._exec(args, callback);
 };
 
 Repository.prototype.push = function (remote, branches, callback) {
-	var args = this._getCommonArgs();
+	var args = [];
 	args.push('push', remote, branches);
 
 	this._exec(args, callback);
 };
 
-
-Repository.prototype._getCommonArgs = function () {
-	var args = [];
-	args.push('--git-dir=' + this.git_dir);
-	if (!this.bare) {
-		args.push('--work-tree=' + this.tree_dir);
-	}
-
-	return args;
-};
-
 Repository.prototype._exec = function (args, callback) {
-	var op = spawn('git', args);
+	var op = spawn('git', args, {
+		'cwd': this.tree_dir
+	});
 	if (typeof callback === 'function') {
 		var log = [];
 		op.on('exit', function (code) {
