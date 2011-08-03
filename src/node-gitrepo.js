@@ -105,6 +105,55 @@ Repository.prototype.push = function (remote, branches, callback) {
 	this._exec(args, callback);
 };
 
+Repository.prototype.listBranches = function (callback) {
+	var args = [];
+	args.push('branch');
+
+	this._exec(args, function (err, log) {
+		if (err) {
+			callback(err, null);
+		} else {
+			var branches = [];
+
+			log = log.join("\n").split("\n");
+			log.forEach(function (line) {
+				line = line.substr(2);
+				if (line) {
+					line = line.split(' ');
+					branches.push(line[0]);
+				}
+			});
+
+			callback(null, branches);
+		}
+	});
+};
+
+Repository.prototype.listBranchesAndTipCommits = function (callback) {
+	var args = [];
+	args.push('branch');
+	args.push('-v');
+
+	this._exec(args, function (err, log) {
+		if (err) {
+			callback(err, null);
+		} else {
+			var map = {};
+
+			log = log.join("\n").split("\n");
+			log.forEach(function (line) {
+				line = line.substr(2);
+				if (line) {
+					line = line.split(' ');
+					map[line[0]] = line[1];
+				}
+			});
+
+			callback(null, map);
+		}
+	});
+};
+
 Repository.prototype._exec = function (args, callback) {
 	var op = spawn('git', args, {
 		'cwd': this.tree_dir
@@ -125,4 +174,4 @@ Repository.prototype._exec = function (args, callback) {
 };
 
 
-exports.Repository = Repository;
+module.exports = Repository;
