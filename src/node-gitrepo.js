@@ -159,7 +159,7 @@ Repository.prototype.listBranchesAndTipCommits = function (callback) {
 
 Repository.prototype._exec = function (args, callback) {
 	var op = spawn('git', args, {
-		'cwd': this.tree_dir
+		'cwd': this.tree_dir || this.git_dir
 	});
 	if (typeof callback === 'function') {
 		var log = [];
