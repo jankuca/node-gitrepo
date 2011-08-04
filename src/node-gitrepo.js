@@ -49,16 +49,10 @@ Repository.prototype.cloneFrom = function (url, branch, callback) {
 	this._exec(args, callback);
 };
 
-Repository.prototype.addRemote = function (name, url, branch, callback) {
-	if (arguments.length === 3) {
-		callback = arguments[2];
-		branch = 'master';
-	}
-
+Repository.prototype.addRemote = function (name, url, callback) {
 	var args = [];
 	args.push('remote', 'add', name);
 	args.push(url);
-	args.push('-b', branch);
 
 	this._exec(args, callback);
 };
