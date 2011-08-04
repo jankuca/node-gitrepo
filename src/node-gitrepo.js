@@ -99,6 +99,15 @@ Repository.prototype.push = function (remote, branches, callback) {
 	this._exec(args, callback);
 };
 
+Repository.prototype.updateSubmodules = function (callback) {
+	var args = [];
+	args.push('submodule', 'update');
+	args.push('--init');
+	args.push('--recursive');
+
+	this._exec(args, callback);
+};
+
 Repository.prototype.listBranches = function (callback) {
 	var args = [];
 	args.push('branch');
