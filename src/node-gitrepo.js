@@ -164,7 +164,7 @@ Repository.prototype._exec = function (args, callback) {
 	if (typeof callback === 'function') {
 		var log = [];
 		op.on('exit', function (code) {
-			var err = (parseInt(code, 10) === 0) ? null : new Error(log[0]);
+			var err = (parseInt(code, 10) === 0) ? null : new Error(log[log.length - 1]);
 			callback(err, log);
 		});
 		op.stdout.on('data', function (buffer) {
