@@ -147,7 +147,7 @@ Repository.prototype.listBranchesAndTipCommits = function (callback) {
 			log.forEach(function (line) {
 				line = line.substr(2);
 				if (line) {
-					line = line.split(' ');
+					line = line.split(/\s+/);
 					map[line[0]] = line[1];
 				}
 			});
