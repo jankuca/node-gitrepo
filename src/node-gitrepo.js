@@ -35,7 +35,7 @@ Repository.prototype.init = function (callback) {
 	return this._exec(args, callback);
 };
 
-Repository.prototype.cloneFrom = function (url, branch, callback) {	
+Repository.prototype.cloneFrom = function (url, branch, callback) {
 	if (arguments.length === 2) {
 		callback = arguments[1];
 		branch = 'master';
@@ -166,7 +166,9 @@ Repository.prototype._exec = function (args, callback) {
 		var log = [];
 		op.on('exit', function (code) {
 			var err = (parseInt(code, 10) === 0) ? null : new Error(log[log.length - 1]);
-			callback(err, log);
+			setTimeout(function () {
+				callback(err, log);
+			}, 10);
 		});
 		op.stdout.on('data', function (buffer) {
 			log.push(buffer.toString());
